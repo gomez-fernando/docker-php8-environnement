@@ -1,0 +1,63 @@
+version: '3.4'
+services:
+  webserver:
+    build:
+      args:
+        email: 'fernando.amazingweb@gmail.com'
+        user: 'application'
+      context: webserver
+      dockerfile: Dockerfile
+    container_name: webserver_lts
+    volumes:
+      - ./www/:/var/www/projects/
+    environment:
+      PHP_DATE_TIMEZONE: 'Europe/Madrid'
+      XDEBUG_MODE : 'develop,debug,coverage'
+      XDEBUG_START_WITH_REQUEST : 'yes'
+    depends_on:
+      - database
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9001:9001"
+      - "8080:8080"
+    networks:
+      network:
+        ipv4_address: 174.16.4.1
+  database:
+    container_name: database
+    image: mysql:8.0
+    tty: true
+    volumes:
+      - "./.mysql-data/db:/var/lib/mysql"
+      - "./webserver/databases:/opt/databases"
+    ports:
+      - "33306:3306"
+    environment:
+        MYSQL_ROOT_PASSWORD: 'root'
+        MYSQL_DATABASE: 'application_db'
+        MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    networks:
+      network:
+        ipv4_address: 174.16.4.2
+  mail:
+    container_name: sys_mail
+    restart: unless-stopped
+    image: eaudeweb/mailtrap
+    ports:
+      - "8125:80"
+      - "2525:25"
+    environment:
+      - MT_USER=mailtrap
+      - MT_PASSWD=mailtrap
+      - MT_MAILBOX_LIMIT=512000001
+      - MT_MESSAGE_LIMIT=102400001
+    networks:
+      network:
+        ipv4_address: 174.16.4.3
+networks:
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 174.16.4.0/16
