@@ -22,7 +22,7 @@ make ssh-root
 example:  
 ``
 make ssh-root
-make vhost APP=<the folder name of your application>
+make vhost APP=<the folder's name of your application>
 ``
 
 ## Edit the vhost file for error logs for an app different from symfony
